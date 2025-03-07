@@ -190,7 +190,7 @@ static void zf_pushr(zf_ctx *ctx, zf_cell v)
 }
 
 
-static zf_cell zf_popr(zf_ctx *ctx)
+zf_cell zf_popr(zf_ctx *ctx)
 {
 	zf_cell v;
 	CHECK(ctx, RSP(ctx) > 0, ZF_ABORT_RSTACK_UNDERRUN);

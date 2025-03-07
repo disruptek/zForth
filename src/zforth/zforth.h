@@ -90,6 +90,8 @@ void zf_abort(zf_ctx *ctx, zf_result reason);
 void zf_push(zf_ctx *ctx, zf_cell v);
 zf_cell zf_pop(zf_ctx *ctx);
 zf_cell zf_pick(zf_ctx *ctx, zf_addr n);
+zf_cell zf_pickr(zf_ctx *ctx, zf_addr n);
+zf_cell zf_popr(zf_ctx *ctx);
 
 zf_result zf_uservar_set(zf_ctx *ctx, zf_uservar_id uv, zf_cell v);
 zf_result zf_uservar_get(zf_ctx *ctx, zf_uservar_id uv, zf_cell *v);
