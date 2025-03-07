@@ -413,6 +413,7 @@ static int find_word(zf_ctx *ctx, const char *name, zf_addr *word, zf_addr *code
 {
 	zf_addr w = LATEST(ctx);
 	size_t namelen = strlen(name);
+	zf_addr q = w;
 
 	while(w) {
 		zf_cell link, d;
@@ -430,6 +431,9 @@ static int find_word(zf_ctx *ctx, const char *name, zf_addr *word, zf_addr *code
 			}
 		}
 		w = link;
+		/* Prevent infinite loops */
+		if (q <= w) break;
+		q = w;
 	}
 
 	return 0;
