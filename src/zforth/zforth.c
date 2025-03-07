@@ -671,11 +671,11 @@ static void do_prim(zf_ctx *ctx, zf_prim op, const char *input)
 
 		case PRIM_MOD:
 			/* Modulo next element on stack by top element */
-			if((int)(d2 = zf_pop(ctx)) == 0) {
+			if((zf_int)(d2 = zf_pop(ctx)) == 0) {                       
 				zf_abort(ctx, ZF_ABORT_DIVISION_BY_ZERO);
 			}
 			d1 = zf_pop(ctx);
-			zf_push(ctx, (int)d1 % (int)d2);
+			zf_push(ctx, (zf_int)d1 % (zf_int)d2);                         
 			break;
 
 		case PRIM_IMMEDIATE:
