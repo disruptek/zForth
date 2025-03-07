@@ -49,18 +49,18 @@ typedef enum {
 	PRIM_JMP,     PRIM_JMP0,      PRIM_TICK, PRIM_COMMENT, PRIM_PUSHR,    PRIM_POPR,
 	PRIM_EQUAL,   PRIM_SYS,       PRIM_PICK, PRIM_COMMA,   PRIM_KEY,      PRIM_LITS,
 	PRIM_LEN,     PRIM_AND,       PRIM_OR,   PRIM_XOR,     PRIM_SHL,      PRIM_SHR,
-	PRIM_LITERAL,
+	PRIM_LITERAL, PRIM_CREATE,
 	PRIM_COUNT
 } zf_prim;
 
 static const char prim_names[] =
-	_("exit")    _("lit")        _("<0")    _(":")     _("_;")        _("+")
-	_("-")       _("*")          _("/")     _("%")     _("drop")      _("dup")
-	_("pickr")   _("_immediate") _("@@")    _("!!")    _("swap")      _("rot")
-	_("jmp")     _("jmp0")       _("'")     _("_(")    _(">r")        _("r>")
-	_("=")       _("sys")        _("pick")  _(",,")    _("key")       _("lits")
-	_("##")      _("&")          _("|")     _("^")     _("<<")        _(">>")
-	_("_literal");
+	_("exit")     _("lit")        _("<0")    _(":")     _("_;")        _("+")
+	_("-")        _("*")          _("/")     _("%")     _("drop")      _("dup")
+	_("pickr")    _("_immediate") _("@@")    _("!!")    _("swap")      _("rot")
+	_("jmp")      _("jmp0")       _("`")     _("_(")    _(">r")        _("r>")
+	_("=")        _("sys")        _("pick")  _(",,")    _("key")       _("lits")
+	_("##")       _("&")          _("|")     _("^")     _("<<")        _(">>")
+	_("_literal") _("create");
 
 
 /* User variables are variables which are shared between forth and C. From
@@ -563,6 +563,18 @@ static void do_prim(zf_ctx *ctx, zf_prim op, const char *input)
 			 * on the stack. */
 			if(COMPILING(ctx)) dict_add_lit(ctx, zf_pop(ctx));
 			/* FIXME: else abort "!compiling"? */
+			break;
+
+		case PRIM_CREATE:
+			/* Create a new body-less word without altering compilation mode */
+			if(input == NULL) {
+				ctx->input_state = ZF_INPUT_PASS_WORD;
+			} else {
+				create(ctx, input, 0);
+				addr = HERE(ctx) + sizeof(zf_cell);
+				dict_add_lit(ctx, addr);
+				dict_add_op(ctx, PRIM_EXIT);
+			}
 			break;
 
 		case PRIM_LIT:
