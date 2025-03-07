@@ -161,6 +161,20 @@ zf_input_state zf_host_sys(zf_ctx *ctx, zf_syscall_id id, const char *input)
 			save(ctx, "zforth.save");
 			break;
 
+		case ZF_SYSCALL_USER + 4: /* FMOD */
+			{
+			zf_cell y = zf_pop(ctx);
+			zf_cell x = zf_pop(ctx);
+			if(0.0 == (float)y) {
+				zf_abort(ctx, ZF_ABORT_DIVISION_BY_ZERO);
+			} else if(isinf((float)x)) {
+				zf_push(ctx, NAN);
+			} else {
+				zf_push(ctx, (zf_cell) fmodf((float)x, (float)y));
+			}
+			}
+			break;
+
 		default:
 			printf("unhandled syscall %d\n", id);
 			break;
