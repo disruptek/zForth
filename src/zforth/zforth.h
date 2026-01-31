@@ -58,6 +58,9 @@ typedef enum {
 } zf_uservar_id;
 
 
+/* Maximum word length for input parsing */
+#define ZF_INPUT_BUF_SIZE 32
+
 typedef struct {
 	/* Stacks and dictionary memory */
 	zf_cell rstack[ZF_RSTACK_SIZE];
@@ -67,6 +70,13 @@ typedef struct {
 	/* State and stack and interpreter pointers */
 	zf_input_state input_state;
 	zf_addr ip;
+
+	/* Input buffer for word parsing */
+	char input_buf[ZF_INPUT_BUF_SIZE];
+	size_t input_len;
+
+	/* Trace buffer for op_name lookup */
+	char trace_buf[ZF_INPUT_BUF_SIZE];
 
 	/* setjmp env for handling aborts */
 	jmp_buf jmpbuf;

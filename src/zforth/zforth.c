@@ -110,7 +110,6 @@ static void do_trace(zf_ctx *ctx, const char *fmt, ...)
 static const char *op_name(zf_ctx *ctx, zf_addr addr)
 {
 	zf_addr w = LATEST(ctx);
-	static char name[32];
 
 	while(TRACE(ctx) && w) {
 		zf_addr xt, p = w;
@@ -125,9 +124,9 @@ static const char *op_name(zf_ctx *ctx, zf_addr addr)
 
 		if(((lenflags & ZF_FLAG_PRIM) && addr == (zf_addr)op2) || addr == w || addr == xt) {
 			int l = ZF_FLAG_LEN(lenflags);
-			dict_get_bytes(ctx, p, name, l);
-			name[l] = '\0';
-			return name;
+			dict_get_bytes(ctx, p, ctx->trace_buf, l);
+			ctx->trace_buf[l] = '\0';
+			return ctx->trace_buf;
 		}
 
 		w = link;
@@ -882,9 +881,6 @@ static void handle_word(zf_ctx *ctx, const char *buf)
 
 static void handle_char(zf_ctx *ctx, char c)
 {
-	static char buf[32];
-	static size_t len = 0;
-
 	if(ctx->input_state == ZF_INPUT_PASS_CHAR) {
 
 		ctx->input_state = ZF_INPUT_INTERPRET;
@@ -892,16 +888,16 @@ static void handle_char(zf_ctx *ctx, char c)
 
 	} else if(c != '\0' && !isspace(c)) {
 
-		if(len < sizeof(buf)-1) {
-			buf[len++] = c;
-			buf[len] = '\0';
+		if(ctx->input_len < ZF_INPUT_BUF_SIZE-1) {
+			ctx->input_buf[ctx->input_len++] = c;
+			ctx->input_buf[ctx->input_len] = '\0';
 		}
 
 	} else {
 
-		if(len > 0) {
-			len = 0;
-			handle_word(ctx, buf);
+		if(ctx->input_len > 0) {
+			ctx->input_len = 0;
+			handle_word(ctx, ctx->input_buf);
 		}
 	}
 }
@@ -920,6 +916,7 @@ void zf_init(zf_ctx *ctx, int enable_trace)
 	DSP(ctx) = 0;
 	RSP(ctx) = 0;
 	COMPILING(ctx) = 0;
+	ctx->input_len = 0;
 }
 
 
